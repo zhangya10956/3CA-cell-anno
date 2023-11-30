@@ -1,2 +1,2 @@
 # 3CA-cell-anno
-A new tool for cell anno based on scRNA-seq data
+3CA: An interpretable deep learning method to automatically annotate cell type in scRNA-seq data with residual network and layer class activation maps
