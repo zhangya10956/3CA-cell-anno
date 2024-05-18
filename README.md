@@ -30,6 +30,6 @@ All gene expression matrices should be stored in h5ad files.
 ## Issues
 
 If you encounter any bugs or have any specific feature requests, please [file an
-issue](https://github.com/scDLC-code/scDLC/issues).
+issue](https://github.com/zhangya10956/scCAM-cell-anno/issues).
 
 ---
