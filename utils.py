@@ -219,9 +219,9 @@ def get_test_dataloader(mean, std, batch_size=16, num_workers=2, shuffle=True):
     return cifar100_test_loader
 
 
-def get_training_dataloader_3CA(train_path, resize, batch_size):
+def get_training_dataloader_scCAM(train_path, resize, batch_size):
     """
-        加载3CA数据
+        加载scCAM数据
         :return: dataloader
         """
     data_transform = transforms.Compose([
@@ -233,9 +233,9 @@ def get_training_dataloader_3CA(train_path, resize, batch_size):
     return dataloader
 
 
-def get_test_dataloader_3CA(test_path, resize, batch_size):
+def get_test_dataloader_scCAM(test_path, resize, batch_size):
     """
-    加载3CA数据
+    加载scCAM数据
     :return: dataloader
     """
     data_transform = transforms.Compose([

@@ -1,7 +1,7 @@
 # preprocess.py
 #!/usr/bin/env	python3
 
-""" data preprocessing using pytorch
+""" H5ad file to grayscale image using pytorch
 
 author YaZhang
 """
@@ -22,6 +22,7 @@ print(adata.obs['cell_groups'].unique())
 print(adata.n_obs)
 print(adata.n_vars)
 
+#Normalize the data to between 0 and 1, and multiply by 255
 def normalization(data):
     _range = np.max(data) - np.min(data)
     print(np.max(data))
@@ -32,7 +33,7 @@ X1 = adata.X
 X1 = normalization(X1)
 adata.X = X1
 
-
+#Transforme the cellular gene expression information into the image according to the dataname and cell_groups.
 for i in adata.obs['dataname'].unique():
     adata_i = adata[adata.obs['dataname'] == i, :]
     for j in adata.obs['cell_groups'].unique():
@@ -48,9 +49,12 @@ for i in adata.obs['dataname'].unique():
 
         for cell_i in range(cellnum):
             gene_features_i = trainX[cell_i:cell_i + 1, :]
+
+            #Image size is 50 wide and 40 high
             gene_features_i = gene_features_i.reshape(40, 50)
             img_i = Image.fromarray(gene_features_i)
 
+            #Save the image to the specified path
             file_path_IMG = 'save_IMG_filepath' + '/' + str(i) + '/' + str(j) + '/' + str(cell_i) + '.png'
             img_i.convert('L').save(file_path_IMG, format='png')
 

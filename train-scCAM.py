@@ -1,3 +1,9 @@
+# preprocess.py
+#!/usr/bin/env	python3
+
+"""
+scCAM train using pytorch
+"""
 
 import os
 import argparse
@@ -11,16 +17,16 @@ from torch.utils.tensorboard import SummaryWriter
 from conf import settings
 from utils import get_network, WarmUpLR, \
     most_recent_folder, most_recent_weights, last_epoch, best_acc_weights, \
-    get_training_dataloader_3CA, get_test_dataloader_3CA
+    get_training_dataloader_scCAM, get_test_dataloader_scCAM
 
 os.environ['KMP_DUPLICATE_LIB_OK']= 'TRUE'
 
-
+#Defining the training section
 def train(epoch):
 
     start = time.time()
     net.train()
-    for batch_index, (images, labels) in enumerate(CA_training_loader):
+    for batch_index, (images, labels) in enumerate(scCAM_training_loader):
         # cv2.imshow('test', images)
         # cv2.waitKey(0)
         # print(labels)
@@ -34,7 +40,7 @@ def train(epoch):
         loss.backward()
         optimizer.step()
 
-        n_iter = (epoch - 1) * len(CA_training_loader) + batch_index + 1
+        n_iter = (epoch - 1) * len(scCAM_training_loader) + batch_index + 1
 
         last_layer = list(net.children())[-1]
         for name, para in last_layer.named_parameters():
@@ -68,10 +74,11 @@ def train(epoch):
         optimizer.param_groups[0]['lr'],
         epoch=epoch,
         trained_samples=batch_index * args.b + len(images),
-        total_samples=len(CA_training_loader.dataset)
+        total_samples=len(scCAM_training_loader.dataset)
     ))
     print('epoch {} training time consumed: {:.2f}s'.format(epoch, finish - start))
 
+#Defining the evaluation section
 @torch.no_grad()
 def eval_training(epoch=0, tb=True):
 
@@ -81,7 +88,7 @@ def eval_training(epoch=0, tb=True):
     test_loss = 0.0  # cost function error
     correct = 0.0
 
-    for (images, labels) in CA_test_loader:
+    for (images, labels) in scCAM_test_loader:
 
         if args.gpu:
             images = images.cuda()
@@ -101,29 +108,30 @@ def eval_training(epoch=0, tb=True):
     print('Evaluating Network.....')
     print('Test set: Epoch: {}, Average loss: {:.4f}, Accuracy: {:.4f}, Time consumed:{:.2f}s'.format(
         epoch,
-        test_loss / len(CA_test_loader.dataset),
-        correct.float() / len(CA_test_loader.dataset),
+        test_loss / len(scCAM_test_loader.dataset),
+        correct.float() / len(scCAM_test_loader.dataset),
         finish - start
     ))
     print()
 
     # add informations to tensorboard
     if tb:
-        writer.add_scalar('Test/Average loss', test_loss / len(CA_test_loader.dataset), epoch)
-        writer.add_scalar('Test/Accuracy', correct.float() / len(CA_test_loader.dataset), epoch)
+        writer.add_scalar('Test/Average loss', test_loss / len(scCAM_test_loader.dataset), epoch)
+        writer.add_scalar('Test/Accuracy', correct.float() / len(scCAM_test_loader.dataset), epoch)
 
-    return correct.float() / len(CA_test_loader.dataset)
+    return correct.float() / len(scCAM_test_loader.dataset)
 
 
 if __name__ == '__main__':
 
     net_name = 'resnet18'
     resize = settings.RESIZE
-    CA_path = settings.CA_PATH
-    train_path = os.path.join(CA_path, 'train')
-    test_path = os.path.join(CA_path, 'test')
+    #Change the scCAM_path in conf.global_settings.py
+    scCAM_path = settings.scCAM_PATH
+    train_path = os.path.join(scCAM_path, 'train')
+    test_path = os.path.join(scCAM_path, 'test')
 
-
+    #Training parameter settings
     parser = argparse.ArgumentParser()
     # parser.add_argument('-net', type=str,required=True, help='net type')
     parser.add_argument('-net', type=str, default=net_name, help='net type')    # required=True
@@ -135,8 +143,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     net = get_network(args)
 
-    CA_training_loader = get_training_dataloader_3CA(train_path, resize, batch_size=args.b)
-    CA_test_loader = get_test_dataloader_3CA(test_path, resize, batch_size=args.b)
+    scCAM_training_loader = get_training_dataloader_scCAM(train_path, resize, batch_size=args.b)
+    scCAM_test_loader = get_test_dataloader_scCAM(test_path, resize, batch_size=args.b)
 
 
     loss_function = nn.CrossEntropyLoss()
@@ -145,7 +153,7 @@ if __name__ == '__main__':
     # learning rate decay
     train_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=settings.MILESTONES, gamma=0.2)
 
-    iter_per_epoch = len(CA_training_loader)
+    iter_per_epoch = len(scCAM_training_loader)
     # print(iter_per_epoch)
     warmup_scheduler = WarmUpLR(optimizer, iter_per_epoch * args.warm)
 
