@@ -12,6 +12,8 @@ scCAM: An interpretable deep learning method to automatically annotate cell type
 
 All of the above files require changes to the input and output paths.
 
+ACTINN and SVM are comparison Methods.
+
 
 ## Requirements
 
