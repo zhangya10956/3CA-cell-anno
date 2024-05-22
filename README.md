@@ -9,6 +9,7 @@ scCAM: An interpretable deep learning method to automatically annotate cell type
 4、split_data_scCAM.py (not necessary)
 5、train-scCAM.py
 6、test-scCAM.py
+7、HAGs_visualization
 
 All of the above files require changes to the input and output paths.
 
